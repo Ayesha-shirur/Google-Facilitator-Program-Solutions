@@ -1,0 +1,22 @@
+Task 1. Create a Linux VM instance
+
+  Goto Compute Engine -> VM Instannces -> Create Instance.
+
+     Name : apache
+     Zone : us-central1-a
+     Series : N1
+     Boot Disk : Linux 9 (stretch)
+
+     Tick : Allow HTTP Traffic
+            Allow HTTPS Traffic
+
+  -> Click Create.
+ -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+Task 2. Enable public access to VM instance
+    sudo su -
+    apt-get update
+    apt-get install apache2 -y
+    service --status-all
+    
+   -> Click on External IP of 'apache' instance.
