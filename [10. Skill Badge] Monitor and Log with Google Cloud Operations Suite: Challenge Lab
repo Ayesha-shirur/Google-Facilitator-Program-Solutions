@@ -1,0 +1,55 @@
+Task 1. Configure Cloud Monitoring
+
+-> Initialize Cloud Monitoring.
+-> Navigation menu > Monitoring
+
+PS: The rationale for this step is very simple, but when you do it for the first time and the second time, it doesn't work!
+Then you can do it again after a period of time without special changes. It is estimated that it is Platform (Qwiklabs) Checkpoints issue
+
+Task 2. Configure a Compute Instance to generate Custom Cloud Monitoring metrics
+
+1. Navigation Menu > Compute Engine > VM Instances
+2. The selected video-queue-monitorinstance
+3. Click Edit Find Custom metadata
+  set MY_PROJECT_ID
+  set INSTANCE-ID (swipe up the page to have INSTANCE-ID to copy)
+  set MY_GCE_INSTANCE_ZONE="us-east1-b"
+  PS: Not sure if there is any difference in Zone settings
+4. Save
+5. Stop and Start video-queue-monitor
+PS: You can check the reminder record and click on the state switch
+
+Task 3. Create a custom metric using Cloud Operations logging events
+
+1. Navigation menu > Logging > Logs Explorer
+2. Fill in the Query Section
+3. textPayload=~"file_format\: ([4,8]K).*"
+4. Then Run Query
+5. There is Action in the lower right , click Action and then drop down and click Create Metric
+6. The name of the custom metric is set tolarge_video_upload_rate
+
+Task 4. Add custom metrics to the Media Dashboard in Cloud Operations Monitoring
+Navigation menu > Monitoring > Dashboards
+
+1. click Media_Dashboard
+2. Click VIEWING in the upper right , then click Switch to Editing mode
+Center right click ADD CHART > click Line
+3. Set resources, metrics on the left half
+1)
+- resource type: gce_instance
+- metric: input_queue_size
+2)
+- resource type: gce_instance
+- metric: large_video_upload_rate
+
+Task 5. Create a Cloud Operations alert based on the rate of high resolution video file uploads
+Navigation menu > Monitoring > Alerting
+
+CREATE POLICY
+ADD CONDITION
+-> resource type: gae_instance
+-> metric: large_video_upload_rate
+-> condition: (different from Reference) is above 3(Threshold) 1(minute)
+-> ADD > Next > Next
+-> Alert Name: High resolution video uploads
+-> Save
