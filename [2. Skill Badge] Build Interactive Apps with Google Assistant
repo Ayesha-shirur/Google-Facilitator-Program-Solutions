@@ -1,0 +1,84 @@
+Task 1: Create the Cloud Function for the Magic Eight Ball app for Google Assistant
+
+  1. Goto Navigation Menu -> Cloud Functions -> Create Function
+  2. Function name : As mentioned to you in your task
+  3. Authentication: Allow unauthenticated invocations
+  4. Change Maximum no of instances to 5
+  5.Save and than Click next
+      Runtime : Python 3.9
+      Source Code : Inline Editor
+      Entity Name - As provided to you
+  
+Replace main.py with
+
+  import random
+  import logging
+  import google.cloud.logging
+  from google.cloud import translate_v2 as translate
+  from flask import Flask, request, make_response, jsonify
+  def REPLACE_WITH_YOUR_ENTRY_POINT(request):
+      client = google.cloud.logging.Client()
+      client.get_default_handler()
+      client.setup_logging()
+      choices = [
+          "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.","Signs point to yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."
+      ]
+      magic_eight_ball_response = random.choice(choices)
+      logging.info(magic_eight_ball_response)
+      return make_response(jsonify({'fulfillmentText': magic_eight_ball_response }))
+
+    Make sure to replace line 6 of main.py file with your entry point name as provided to youre place requirements.txt with this COPY
+
+    COPY
+    google-cloud-translate
+    google-cloud-logging
+
+    Deploy and wait until is being created
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Task 2: Create the Magic 8 Ball app for Google Assistant
+
+    Open link in private window
+    https://console.actions.google.com/?pli=1
+
+    New Project -> Accept terms (Yes) -> Project Name (GCP ID) -> Import Project
+
+    Click on Action Console at the top left corner -> Select your GCP ID project -> Build Your Action -> Add Action -> Get Started -> Custom Intent -> Build -> Accept terms
+
+    Press Create On the Actions page change the display name to magic 8 ball
+
+    Intent -> Delete other responses -> and add this text response -> Welcome to the lab magic 8 ball, ask me a yes or no question and I will predict the future! -> Save -> Default fallback intent -> Set intent at the end of the conversation -> Fullfillment enable webhook call for this intent
+
+    Fulfillment -> Enable Webhook -> Paste your trigger url of your cloud function -> Save Copy the Link from your cloud functions
+
+    Go to Integrations -> Try Actions Builder -> Enable web activity if not enabled
+
+    -> Test Your App with google assistant , it is available on action console press talk to start
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Task 3: Add multilingual support to your Cloud Function
+
+Goto your cloud function and change the main.py add this lines after line 13
+
+        request_json = request.get_json()
+        if request_json and 'queryResult' in request_json:
+            question = request_json.get('queryResult').get('queryText')
+        # try to identify the language
+        language = 'en'
+        translate_client = translate.Client()
+        detected_language = translate_client.detect_language(question)
+        if detected_language['language'] == 'und':
+            language = 'en'
+        elif detected_language['language'] != 'en':
+            language = detected_language['language']
+        # translate if not english
+        if language != 'en':
+            logging.info('translating from en to %s' % language)
+            translated_text = translate_client.translate(
+                 magic_eight_ball_response, target_language=language)
+            magic_eight_ball_response = translated_text['translatedText']
+
+Go to Integrations -> Try Actions Builder -> -> Test You App with google assitant with this commands
+
+Text you assistant with commands which is mention in your Lab
